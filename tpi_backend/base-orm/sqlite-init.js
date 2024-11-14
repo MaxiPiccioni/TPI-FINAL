@@ -7,6 +7,22 @@ async function CrearBasePasteleria() {
 
   let res = null;
 
+  // Crear tabla Usuarios (la usaremos para login)
+  res = await db.get(
+    "SELECT count(*) as contar FROM sqlite_schema WHERE type = 'table' and name= 'usuarios'",
+    []
+  );
+  if (res.contar === 0) {
+    await db.run(
+      "CREATE table usuarios( IdUsuario INTEGER PRIMARY KEY AUTOINCREMENT, Nombre text NOT NULL UNIQUE, Clave text NOT NULL, Rol text NOT NULL);"
+    );
+    console.log("tabla usuarios creada!");
+    await db.run(
+      "insert into usuarios values	(1,'admin','123','admin'),(2,'juan','123','member');"
+    );
+  }
+
+
   // Crear tabla Productos
   res = await db.get(
     "SELECT count(*) as contar FROM sqlite_schema WHERE type = 'table' AND name = 'Productos';",

@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const auth = require("../seguridad/auth");
+
 
 const db = require("../base-orm/sequelize-init");
 
@@ -112,5 +114,32 @@ router.delete('/api/proveedores/:id', async (req, res) => {
         res.status(500).json({ message: 'Error al eliminar el proveedor', error });
     }
 });
+
+
+//-- SEGURIDAD ---------------------------
+//------------------------------------
+router.get(
+    "/api/proveedoresJWT",
+    auth.authenticateJWT,
+    async function (req, res, next) {
+      const { rol } = res.locals.user;
+      if (rol !== "admin") {
+        return res.status(403).json({ message: "usuario no autorizado!" });
+      }
+  
+      let items = await db.Proveedores.findAll({
+        attributes: [
+          "id_proveedor",
+          "nombre_empresa",
+          "nombre_proveedor",
+          "telefono",
+          "fecha_registro",
+        ],
+        order: [["nombre_proveedor", "ASC"]],
+      });
+      res.json(items);
+    }
+  );
+  
 
 module.exports = router;

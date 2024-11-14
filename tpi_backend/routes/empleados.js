@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const auth = require("../seguridad/auth");
+
 
 const db = require("../base-orm/sequelize-init");
 
@@ -95,5 +97,30 @@ router.delete('/api/empleados/:id', async (req, res) => {
       res.status(500).json({ message: 'Error al eliminar el empleado', error });
   }
 });
+
+
+//-- SEGURIDAD ---------------------------
+//------------------------------------
+router.get(
+  "/api/empleadosJWT",
+  auth.authenticateJWT,
+  async function (req, res, next) {
+    const { rol } = res.locals.user;
+    if (rol !== "admin") {
+      return res.status(403).json({ message: "usuario no autorizado!" });
+    }
+
+    let items = await db.Empleados.findAll({
+      attributes: [
+        "id_empleado",
+        "nombre_empleado",
+        "sexo",
+        "fecha_nacimiento",
+      ],
+      order: [["nombre_empleado", "ASC"]],
+    });
+    res.json(items);
+  }
+);
 
 module.exports = router;

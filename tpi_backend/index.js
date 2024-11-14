@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
+
 // Crear servidor
 const app = express();
 require("./base-orm/sqlite-init");
@@ -23,6 +24,7 @@ const rutasLocales = require("./routes/locales");
 const rutasProductos = require("./routes/productos");
 const rutasProveedores = require("./routes/proveedores");
 const rutasVentas = require("./routes/ventas");
+const seguridadRouter = require("./routes/seguridad");
 
 app.use(rutasClientes);
 app.use(rutasEmpleados);
@@ -30,6 +32,7 @@ app.use(rutasLocales);
 app.use(rutasProductos);
 app.use(rutasProveedores);
 app.use(rutasVentas);
+app.use(seguridadRouter);
 
 if (!module.parent) {   
   const port = process.env.PORT || 3000;   

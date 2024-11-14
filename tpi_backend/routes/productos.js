@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../base-orm/sequelize-init");
+const auth = require("../seguridad/auth");
+
 
 // GET para todos los productos
 router.get("/api/productos", async function (req, res, next) {
@@ -127,5 +129,32 @@ router.delete('/api/productos/:id', async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el producto', error });
   }
 });
+
+
+//-- SEGURIDAD ---------------------------
+//------------------------------------
+router.get(
+  "/api/productosJWT",
+  auth.authenticateJWT,
+  async function (req, res, next) {
+    const { rol } = res.locals.user;
+    if (rol !== "admin") {
+      return res.status(403).json({ message: "usuario no autorizado!" });
+    }
+
+    let items = await db.Productos.findAll({
+      attributes: [
+        "id_producto",
+        "nombre_prod",
+        "precio",
+        "fecha_elaboracion",
+        "id_proveedor"
+      ],
+      order: [["nombre_prod", "ASC"]],
+    });
+    res.json(items);
+  }
+);
+
 
 module.exports = router;

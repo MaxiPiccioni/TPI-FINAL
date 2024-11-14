@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const auth = require("../seguridad/auth");
+
 
 const db = require("../base-orm/sequelize-init");
 
@@ -102,5 +104,33 @@ router.delete('/api/locales/:id', async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el local', error });
   }
 });
+
+
+//-- SEGURIDAD ---------------------------
+//------------------------------------
+router.get(
+  "/api/localesJWT",
+  auth.authenticateJWT,
+  async function (req, res, next) {
+    const { rol } = res.locals.user;
+    if (rol !== "admin") {
+      return res.status(403).json({ message: "usuario no autorizado!" });
+    }
+
+    let items = await db.Locales.findAll({
+      attributes: [
+        "id_local",
+        "nombre_loc",
+        "direccion",
+        "telefono",
+        "fecha_apertura",
+        "id_empleado"
+      ],
+      order: [["nombre_loc", "ASC"]],
+    });
+    res.json(items);
+  }
+);
+
 
 module.exports = router;
