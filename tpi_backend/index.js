@@ -6,8 +6,8 @@ const cors = require("cors");
 const app = express();
 require("./base-orm/sqlite-init");
 
-// Configura CORS para permitir solicitudes desde http://localhost:3001
-app.use(cors({ origin: "http://localhost:3001" }));
+// Configura CORS para permitir solicitudes desde http://localhost:5173
+app.use(cors({ origin: "http://localhost:5173" }));
 
 // Middleware para procesar JSON
 app.use(express.json());
